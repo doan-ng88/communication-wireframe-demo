@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Communication Management System</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: #f4f6f9;
+        }
+        .sidebar {
+            min-height: 100vh;
+            background-color: #fff;
+            border-right: 1px solid #e0e0e0;
+            width: 250px;
+            position: fixed;
+            padding-top: 20px;
+        }
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+        .nav-link.active {
+            background-color: #e9ecef;
+            font-weight: bold;
+        }
+        .submenu .nav-link {
+            padding-left: 2rem;
+            font-size: 0.95rem;
+        }
+        .card-header {
+            background-color: #fff;
+            border-bottom: none;
+        }
+        .export-btn {
+            float: right;
+        }
+        .btn-custom {
+            background-color: #0d6efd;
+            color: #fff;
+        }
+        .btn-custom:hover {
+            background-color: #0b5ed7;
+            color: #fff;
+        }
+        .tooltip-inner {
+            max-width: 200px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <div class="sidebar p-3">
+            <h4 class="mb-4">Communication Management</h4>
+            <ul class="nav flex-column">
+                <!-- Overview Link -->
+                <li class="nav-item mb-2">
+                    <a class="nav-link active" href="#overview" data-bs-toggle="tab">
+                        <i class="fas fa-tachometer-alt me-2"></i> Overview
+                    </a>
+                </li>
+                <!-- Mailchimp Integration -->
+                <li class="nav-item mb-2">
+                    <a class="nav-link" href="#mailchimp" data-bs-toggle="tab">
+                        <i class="fas fa-envelope me-2"></i> Mailchimp Integration
+                    </a>
+                    <ul class="nav flex-column submenu">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#api-configuration" data-bs-toggle="tab">
+                                <i class="fas fa-cog me-2"></i> API Configuration
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#member-sync" data-bs-toggle="tab">
+                                <i class="fas fa-sync-alt me-2"></i> Member Data Sync
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#campaign-management" data-bs-toggle="tab">
+                                <i class="fas fa-bullhorn me-2"></i> Campaign Management
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#template-management" data-bs-toggle="tab">
+                                <i class="fas fa-file-alt me-2"></i> Template Management
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#performance-analysis" data-bs-toggle="tab">
+                                <i class="fas fa-chart-line me-2"></i> Performance Analysis
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <!-- SMS -->
+                <li class="nav-item mb-2">
+                    <a class="nav-link" href="#sms" data-bs-toggle="tab">
+                        <i class="fas fa-sms me-2"></i> SMS Management
+                    </a>
+                </li>
+                <!-- App Push Notifications -->
+                <li class="nav-item mb-2">
+                    <a class="nav-link" href="#app-push" data-bs-toggle="tab">
+                        <i class="fas fa-bell me-2"></i> App Push Notifications
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <!-- Main Content -->
+        <div class="main-content flex-grow-1 p-4">
+            <div class="tab-content">
+                <!-- Overview Tab -->
+                <div class="tab-pane fade show active" id="overview">
+                    <h3 class="mb-4">Overview Dashboard</h3>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card text-white bg-primary mb-3">
+                                <div class="card-header"><i class="fas fa-envelope me-2"></i> Email Campaigns</div>
+                                <div class="card-body">
+                                    <h5 class="card-title">Active: 12</h5>
+                                    <p class="card-text">Total campaigns running on Mailchimp.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card text-white bg-success mb-3">
+                                <div class="card-header"><i class="fas fa-sms me-2"></i> SMS Campaigns</div>
+                                <div class="card-body">
+                                    <h5 class="card-title">Scheduled: 8</h5>
+                                    <p class="card-text">Total SMS campaigns in queue.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card text-white bg-warning mb-3">
+                                <div class="card-header"><i class="fas fa-bell me-2"></i> Push Notifications</div>
+                                <div class="card-body">
+                                    <h5 class="card-title">Queued: 15</h5>
+                                    <p class="card-text">Total app push notifications pending.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Analytics Charts -->
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5><i class="fas fa-chart-line me-2"></i> Engagement by Channel</h5>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="engagementChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5><i class="fas fa-chart-bar me-2"></i> Campaign Performance</h5>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="performanceChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Mailchimp Integration Tab -->
+                <div class="tab-pane fade" id="mailchimp">
+                    <!-- API Configuration Sub-Tab -->
+                    <div class="tab-pane fade" id="api-configuration">
+                        <h3 class="mb-4">API Configuration</h3>
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <form>
+                                    <div class="mb-3">
+                                        <label for="apiKey" class="form-label">API Key</label>
+                                        <input type="text" class="form-control" id="apiKey" placeholder="Enter Mailchimp API Key">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="audienceId" class="form-label">Audience ID</label>
+                                        <input type="text" class="form-control" id="audienceId" placeholder="Enter Audience ID">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="requestLimit" class="form-label">Request Limit</label>
+                                        <input type="number" class="form-control" id="requestLimit" placeholder="Set API request limit">
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="errorHandling">
+                                        <label class="form-check-label" for="errorHandling">Enable Error Handling</label>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary mt-3">Save Settings</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Member Data Sync Sub-Tab -->
+                    <div class="tab-pane fade" id="member-sync">
+                        <h3 class="mb-4">Member Data Sync</h3>
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Automated Data Synchronization</h5>
+                            </div>
+                            <div class="card-body">
+                                <p>Automate new member registration, real-time updates, and segment auto-syncing.</p>
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="autoSync">
+                                    <label class="form-check-label" for="autoSync">Enable Auto-Sync for New Members</label>
+                                </div>
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="statusSync">
+                                    <label class="form-check-label" for="statusSync">Auto-Update Subscription Status</label>
+                                </div>
+                                <button class="btn btn-primary">Save Sync Settings</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Campaign Management Sub-Tab -->
+                    <div class="tab-pane fade" id="campaign-management">
+                        <h3 class="mb-4">Campaign Management</h3>
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5>Create & Manage Campaigns</h5>
+                                <button class="btn btn-custom"><i class="fas fa-plus me-1"></i> New Campaign</button>
+                            </div>
+                            <div class="card-body">
+                                <p>Manage regular and automated campaigns, set up A/B tests, schedule sending, and configure dynamic content.</p>
+                                <!-- Campaign Table -->
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Campaign Name</th>
+                                                <th>Type</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Spring Collection Launch</td>
+                                                <td>Regular</td>
+                                                <td><span class="badge bg-success">Active</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></button>
+                                                    <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Flash Sale Reminder</td>
+                                                <td>Automated</td>
+                                                <td><span class="badge bg-warning">Scheduled</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></button>
+                                                    <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                                                </td>
+                                            </tr>
+                                            <!-- Add more rows as needed -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Template Management Sub-Tab -->
+                    <div class="tab-pane fade" id="template-management">
+                        <h3 class="mb-4">Template Management</h3>
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5>Manage Email Templates</h5>
+                                <button class="btn btn-custom"><i class="fas fa-plus me-1"></i> New Template</button>
+                            </div>
+                            <div class="card-body">
+                                <p>Create and manage email templates, configure variables, and test templates before deployment.</p>
+                                <!-- Template Table -->
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Template Name</th>
+                                                <th>Version</th>
+                                                <th>Last Updated</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Welcome Email</td>
+                                                <td>v1.2</td>
+                                                <td>2024-10-01</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></button>
+                                                    <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Promotion Template</td>
+                                                <td>v1.0</td>
+                                                <td>2024-09-15</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></button>
+                                                    <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                                                </td>
+                                            </tr>
+                                            <!-- Add more rows as needed -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Performance Analysis Sub-Tab -->
+                    <div class="tab-pane fade" id="performance-analysis">
+                        <h3 class="mb-4">Performance Analysis</h3>
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Campaign Performance Metrics</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="performanceAnalysisChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- SMS Management Tab -->
+                <div class="tab-pane fade" id="sms">
+                    <h3 class="mb-4">SMS Management</h3>
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5>Create & Schedule SMS Campaigns</h5>
+                            <button class="btn btn-custom"><i class="fas fa-plus me-1"></i> New SMS Campaign</button>
+                        </div>
+                        <div class="card-body">
+                            <p>Create short and long messages, bulk send, and schedule SMS campaigns.</p>
+                            <!-- SMS Campaign Table -->
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Campaign Name</th>
+                                            <th>Message Length</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Winter Discount Alert</td>
+                                            <td>Short</td>
+                                            <td><span class="badge bg-success">Sent</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></button>
+                                                <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Annual Sale Countdown</td>
+                                            <td>Long</td>
+                                            <td><span class="badge bg-warning">Scheduled</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></button>
+                                                <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        <!-- Add more rows as needed -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- App Push Notifications Tab -->
+                <div class="tab-pane fade" id="app-push">
+                    <h3 class="mb-4">App Push Notifications</h3>
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5>Manage Push Notifications</h5>
+                            <button class="btn btn-custom"><i class="fas fa-plus me-1"></i> New Push Notification</button>
+                        </div>
+                        <div class="card-body">
+                            <p>Create and schedule app push notifications, targeting specific user segments or sending immediate notifications.</p>
+                            <!-- Push Notifications Table -->
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Notification Title</th>
+                                            <th>Target Segment</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>New Product Launch</td>
+                                            <td>All Users</td>
+                                            <td><span class="badge bg-success">Active</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></button>
+                                                <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Holiday Sale Alert</td>
+                                            <td>Returning Customers</td>
+                                            <td><span class="badge bg-warning">Scheduled</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></button>
+                                                <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        <!-- Add more rows as needed -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Initialize Tooltips -->
+    <script>
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+          return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+    </script>
+    <!-- Chart.js Initialization -->
+    <script>
+        // Overview Engagement Chart
+        const engagementCtx = document.getElementById('engagementChart').getContext('2d');
+        const engagementChart = new Chart(engagementCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Email', 'SMS', 'Push Notifications'],
+                datasets: [{
+                    label: 'Engagement Rate (%)',
+                    data: [55, 75, 45],
+                    backgroundColor: ['#0d6efd', '#198754', '#ffc107'],
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: true }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+
+        // Campaign Performance Chart
+        const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+        const performanceChart = new Chart(performanceCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+                datasets: [{
+                    label: 'Campaign Performance',
+                    data: [120, 140, 100, 180, 170, 160, 200],
+                    borderColor: '#dc3545',
+                    backgroundColor: 'rgba(220, 53, 69, 0.2)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: true },
+                    tooltip: { enabled: true }
+                },
+                scales: {
+                    y: { beginAtZero: true, max: 250 }
+                }
+            }
+        });
+
+        // Performance Analysis Chart
+        const analysisCtx = document.getElementById('performanceAnalysisChart').getContext('2d');
+        const performanceAnalysisChart = new Chart(analysisCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Open Rate', 'Click-through Rate', 'Conversion Rate'],
+                datasets: [{
+                    data: [45, 25, 30],
+                    backgroundColor: ['#0d6efd', '#ffc107', '#198754'],
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: { enabled: true }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
